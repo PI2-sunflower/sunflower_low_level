@@ -1,0 +1,5 @@
+build/*
+dist/*
+sunflower_ll.egg-info/*
+.DS_Store
+.swp
