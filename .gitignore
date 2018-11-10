@@ -3,4 +3,4 @@ dist/*
 */__pycache__
 sunflower_ll.egg-info/*
 .DS_Store
-.swp
+*.swp
