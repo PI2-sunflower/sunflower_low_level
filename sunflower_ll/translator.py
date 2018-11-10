@@ -1,14 +1,15 @@
-import axis_helper
+from sunflower_ll.axis_helper import *
 #import constants
 
+TOPIC = 'topic'
+COMMAND = 'command'
+
 class Translator:
-    TOPIC = 'topic'
-    COMMAND = 'command'
 
     __commands = {
         'go_up': {TOPIC: 'up_down', COMMAND: 'up'},
         'go_down': {TOPIC: 'up_down', COMMAND: 'down'},
-        'stop_up_down': {TOPIC: 'up_down', COMMAND: 'stop'}
+        'stop_up_down': {TOPIC: 'up_down', COMMAND: 'stop'},
     
         'expand': {TOPIC: 'expand_retract', COMMAND: 'expand'},
         'retract': {TOPIC: 'expand_retract', COMMAND: 'retract'},
@@ -64,12 +65,16 @@ class Translator:
         VALID = 0
         INVALID = 1
         try:
-            new_angles = axis_helper.try_update_axis(__axis_angles, new_axis_angles)
+            new_angles = try_update_axis(self.__axis_angles, new_axis_angles)
         except:
             print('**** INVALID UPDATE ****')
             return INVALID
         self.__axis_angles = new_angles
         return VALID
+
+    def set_single_axis_angle(self, axis, angle):
+        single_axis = {axis: angle}
+        return self.set_axis_angles(single_axis)
 
     def get_axis_angles(self):
         return self.__axis_angles
@@ -78,11 +83,11 @@ class Translator:
         try:
             magnetometer_data = self.get_magnetometer_data()
             elevation_angle_data = self.get_elevation_angle_data()
-            antenna_angles = axis_helper.update_angle_from_reference(\
-                                self.__axis_angles, 
-                                magnetometer_data,
-                                elevation_angle_data)
-            gcode = axis_helper.try_move_axis(antenna_angles, self.__movement_speed)
+            antenna_angles = update_angles_from_reference( \
+                                        self.__axis_angles, 
+                                        magnetometer_data,
+                                        elevation_angle_data)
+            gcode = try_move_axis(antenna_angles, self.__movement_speed)
         except:
             print('**** INVALID MOVEMENT ****')
             gcode = ''
@@ -90,14 +95,11 @@ class Translator:
         move_axis_command[COMMAND] = gcode
         return move_axis_command
 
-    def move_single_axis(self, axis, angle):
-        axis_value = {axis: angle}
-        self.set_axis_angles(axis_value)
-        move_axis_command = self.move_axis()
-        return move_axis_command
-
     def set_movement_speed(self, movement_speed):
-        self.__movement_speed = movement_speed
+        if (movement_speed > 0) and (movement_speed < 1000): 
+            self.__movement_speed = movement_speed
+            return 0
+        return 1
 
     def get_movement_speed(self):
         return self.__movement_speed
