@@ -1,16 +1,26 @@
 import axis_helper
-import constants
+#import constants
+
 class Translator:
+    TOPIC = 'topic'
+    COMMAND = 'command'
 
     __commands = {
-        'go_up': {'topic': 'up_down', 'command': 'up'},
-        'go_down': {'topic': 'up_down', 'command': 'down'},
+        'go_up': {TOPIC: 'up_down', COMMAND: 'up'},
+        'go_down': {TOPIC: 'up_down', COMMAND: 'down'},
+        'stop_up_down': {TOPIC: 'up_down', COMMAND: 'stop'}
+    
+        'expand': {TOPIC: 'expand_retract', COMMAND: 'expand'},
+        'retract': {TOPIC: 'expand_retract', COMMAND: 'retract'},
+        'stop_expand_retract': {TOPIC: 'expand_retract', COMMAND: 'stop'},
+
+        'move_axis': {TOPIC: 'move_axis'}
     }
 
     __axis_angles = {
-        'axis_1': -1,
-        'axis_2': -1,
-        'axis_3': -1
+        'angle_1': 0,
+        'angle_2': 0,
+        'angle_3': 0
     }
 
     __magnetometer_data = {
@@ -18,10 +28,88 @@ class Translator:
         'mag_2': 0
     }
 
+    __elevation_angle_data = {
+        'angle_1': 0,
+        'angle_2': 0
+    }
+
     __movement_speed = 100
 
 
-    # Create sensor class
+
+    ##################################################
+    ################### ACTUATORS ####################
+    ##################################################
+
+    # ************** UP AND DOWN **************
+    def go_up(self):
+        return self.__commands['go_up']
+    def go_down(self):
+        return self.__commands['go_down']
+    def stop_up_down(self):
+        return self.__commands['stop_up_down']
+
+
+    # ************** EXPAND AND RETRACT **************
+    def expand(self):
+        return self.__commands['expand']
+    def retract(self):
+        return self.__commands['retract']
+    def stop_expand_retract(self):
+        return self.__commands['stop_expand_retract']
+
+
+    # ************** AXIS MOVEMENTS **************
+    def set_axis_angles(self, new_axis_angles):
+        VALID = 0
+        INVALID = 1
+        try:
+            new_angles = axis_helper.try_update_axis(__axis_angles, new_axis_angles)
+        except:
+            print('**** INVALID UPDATE ****')
+            return INVALID
+        self.__axis_angles = new_angles
+        return VALID
+
+    def get_axis_angles(self):
+        return self.__axis_angles
+
+    def move_axis(self):
+        try:
+            magnetometer_data = self.get_magnetometer_data()
+            elevation_angle_data = self.get_elevation_angle_data()
+            antenna_angles = axis_helper.update_angle_from_reference(\
+                                self.__axis_angles, 
+                                magnetometer_data,
+                                elevation_angle_data)
+            gcode = axis_helper.try_move_axis(antenna_angles, self.__movement_speed)
+        except:
+            print('**** INVALID MOVEMENT ****')
+            gcode = ''
+        move_axis_command = self.__commands['move_axis']
+        move_axis_command[COMMAND] = gcode
+        return move_axis_command
+
+    def move_single_axis(self, axis, angle):
+        axis_value = {axis: angle}
+        self.set_axis_angles(axis_value)
+        move_axis_command = self.move_axis()
+        return move_axis_command
+
+    def set_movement_speed(self, movement_speed):
+        self.__movement_speed = movement_speed
+
+    def get_movement_speed(self):
+        return self.__movement_speed
+
+
+
+
+    ##################################################
+    #################### SENSORS ####################
+    #################################################
+
+    # Magnetometer Data
     def set_magnetometer_data(self, reference, value):
         self.__magnetometer_data[reference] = value
 
@@ -37,35 +125,18 @@ class Translator:
         return average
 
 
+    # Elevation Angle data
+    def set_elevation_angle_data(self, reference, value):
+        self.__elevation_angle_data[reference]
 
-    def go_up(self):
-        return self.__commands['go_up']
+    def get_elevation_angle_data(self):
+        TOL = 1
+        ead_1 = self.__elevation_angle_data['angle_1']
+        ead_2 = self.__elevation_angle_data['angle_2']
 
-    def go_down(self):
-        return self.__commands['go_down']
+        if abs(ead_1 - ead_2) > TOL:
+            raise Exception('Elevation angle data is not reliable')
 
-    def update_axis(self, new_axis_angles):
-        try:
-            new_angles = axis_helper.try_update_axis(__axis_angles, new_axis_angles)
-        except:
-            return 1
-        __axis_angles = new_angles
-        return 0
-
-    def move_axis(self):
-        try:
-            gcode = axis_helper.try_move_axis(__axis_angles)
-        except:
-            DEFAULT_MOVEMENT = 'G1 X0 Y0 Z0 F100'
-            gcode = DEFAULT_MOVEMENT
-
-        return gcode
-
-
-    def move_single_axis(self, axis, angle):
-        axis_value = {axis: angle}
-        self.update_axis(axis_value)
-        gcode = self.move_axis()
-        return gcode
-
+        average = (ead_1 + ead_2)/2
+        return average
 
