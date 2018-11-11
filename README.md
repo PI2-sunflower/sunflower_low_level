@@ -55,5 +55,9 @@ Function call's are converted into G-Code strings.
 
     -> tr.set_magnetometer_data(value_magnetometer_1, value_magnetometer_2)
         - output: 0="ok", 1="bad magnetometers"
-
     -> tr.get_magnetometer_data() : "returns magnetometer average"
+
+
+    -> tr.set_elevation_angle_data(value_sensor_1, value_sensor_2)
+        - output: 0="ok", 1="bad sensor"
+    -> tr.get_elevation_angle_data() : "returns sensors average"
