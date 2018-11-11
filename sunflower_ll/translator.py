@@ -7,15 +7,15 @@ COMMAND = 'command'
 class Translator:
 
     __commands = {
-        'go_up': {TOPIC: 'up_down', COMMAND: 'up'},
-        'go_down': {TOPIC: 'up_down', COMMAND: 'down'},
-        'stop_up_down': {TOPIC: 'up_down', COMMAND: 'stop'},
+        'go_up': {TOPIC: 'movement/up_down', COMMAND: 'up'},
+        'go_down': {TOPIC: 'movement/up_down', COMMAND: 'down'},
+        'stop_up_down': {TOPIC: 'movement/up_down', COMMAND: 'stop'},
     
-        'expand': {TOPIC: 'expand_retract', COMMAND: 'expand'},
-        'retract': {TOPIC: 'expand_retract', COMMAND: 'retract'},
-        'stop_expand_retract': {TOPIC: 'expand_retract', COMMAND: 'stop'},
+        'expand': {TOPIC: 'movement/expand_retract', COMMAND: 'expand'},
+        'retract': {TOPIC: 'movement/expand_retract', COMMAND: 'retract'},
+        'stop_expand_retract': {TOPIC: 'movement/expand_retract', COMMAND: 'stop'},
 
-        'move_axis': {TOPIC: 'move_axis'}
+        'move_axis': {TOPIC: 'movement/axis'} # axis feedback -> movement/axis_feedback 
     }
 
     __axis_angles = {

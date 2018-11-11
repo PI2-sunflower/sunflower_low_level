@@ -1,6 +1,6 @@
 build/*
 dist/*
 */__pycache__
-sunflower_ll.egg-info/*
+sunflower_low_level.egg-info/*
 .DS_Store
 *.swp

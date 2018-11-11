@@ -15,7 +15,7 @@ class TranslatorTests(unittest.TestCase):
         self.assertTrue(self.tr.stop_expand_retract())
 
     def test_go_up(self):
-        self.assertEqual(self.tr.go_up(), {'topic': 'up_down', 'command': 'up'})
+        self.assertEqual(self.tr.go_up(), {'topic': 'movement/up_down', 'command': 'up'})
 
     def test_set_and_get_axis_angles(self):
         good_angles = {
@@ -50,7 +50,7 @@ class TranslatorTests(unittest.TestCase):
         self.assertEqual(self.tr.get_movement_speed(), 321)
 
     def test_axis_movement(self):
-        self.assertEqual(self.tr.move_axis(), {'topic': 'move_axis', 'command': 'G1  X0 Y0 Z0 F100'})
+        self.assertEqual(self.tr.move_axis(), {'topic': 'movement/axis', 'command': 'G1  X0 Y0 Z0 F100'})
 
         good_angles = {
             'angle_1': 11,
@@ -60,7 +60,7 @@ class TranslatorTests(unittest.TestCase):
         # Good angles
         self.assertEqual(self.tr.set_axis_angles(good_angles), 0)
         self.assertEqual(self.tr.set_movement_speed(211), 0)
-        self.assertEqual(self.tr.move_axis(), {'topic': 'move_axis', 'command': 'G1  X11 Y55 Z99 F211'})
+        self.assertEqual(self.tr.move_axis(), {'topic': 'movement/axis', 'command': 'G1  X11 Y55 Z99 F211'})
 
     def test_magnetometer_data(self):
         self.assertEqual(self.tr.set_magnetometer_data( 10, 10), 0)
