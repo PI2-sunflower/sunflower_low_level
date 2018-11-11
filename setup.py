@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="sunflower_ll",
+    name="sunflower_low_level",
     version="0.0.1",
     author="sunflower team - pi2",
     author_email="alex@sunflower.com",
