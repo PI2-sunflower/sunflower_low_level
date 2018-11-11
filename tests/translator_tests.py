@@ -62,30 +62,23 @@ class TranslatorTests(unittest.TestCase):
         self.assertEqual(self.tr.set_movement_speed(211), 0)
         self.assertEqual(self.tr.move_axis(), {'topic': 'move_axis', 'command': 'G1  X11 Y55 Z99 F211'})
 
+    def test_magnetometer_data(self):
+        self.assertEqual(self.tr.set_magnetometer_data( 10, 10), 0)
+        self.assertEqual(self.tr.get_magnetometer_data(), 10)
 
+        self.assertEqual(self.tr.set_magnetometer_data( 10, 20), 1)
+        self.assertEqual(self.tr.get_magnetometer_data(), 10)
+
+    def test_elevation_angle_data(self):
+        self.assertEqual(self.tr.set_elevation_angle_data( 10, 10), 0)
+        self.assertEqual(self.tr.get_elevation_angle_data(), 10)
+
+        self.assertEqual(self.tr.set_elevation_angle_data( 10, 20), 1)
+        self.assertEqual(self.tr.get_elevation_angle_data(), 10)
 
 
 if __name__ == '__main__':
     unittest.main()
 
 
-
-
-
-
-
-#import sunflower_ll
-#
-#print('Importing:  ', sunflower_ll.name)
-#
-#
-#import sunflower_ll.translator as translator
-#t = translator.Translator()
-#
-#print(t.magnetometer_data())
-#
-#t.set_magnetometer_data('mag_1', 10)
-#
-#t.magnetometer_data()
-#
 

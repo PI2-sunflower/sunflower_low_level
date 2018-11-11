@@ -112,33 +112,38 @@ class Translator:
     #################################################
 
     # Magnetometer Data
-    def set_magnetometer_data(self, reference, value):
-        self.__magnetometer_data[reference] = value
+    def set_magnetometer_data(self, value1, value2):
+        TOL = 1
+        if abs(value1 - value2) > TOL:
+            print('******** Magnetometer data is not reliable ********')
+            return 1
+        else:
+            self.__magnetometer_data['mag_1'] = value1
+            self.__magnetometer_data['mag_2'] = value2
+            return 0
 
     def get_magnetometer_data(self):
-        TOL = 1
         mag_1 = self.__magnetometer_data['mag_1']
         mag_2 = self.__magnetometer_data['mag_2']
-
-        if abs(mag_1 - mag_2) > TOL:
-            raise Exception('Magnetometer data is not reliable')
 
         average = (mag_1 + mag_2)/2
         return average
 
 
     # Elevation Angle data
-    def set_elevation_angle_data(self, reference, value):
-        self.__elevation_angle_data[reference]
+    def set_elevation_angle_data(self, value1, value2):
+        TOL = 1
+        if abs(value1 - value2) > TOL:
+            print('******** Elevation data is not reliable ********')
+            return 1
+        else:
+            self.__elevation_angle_data['angle_1'] = value1
+            self.__elevation_angle_data['angle_2'] = value2
+            return 0
 
     def get_elevation_angle_data(self):
-        TOL = 1
         ead_1 = self.__elevation_angle_data['angle_1']
         ead_2 = self.__elevation_angle_data['angle_2']
 
-        if abs(ead_1 - ead_2) > TOL:
-            raise Exception('Elevation angle data is not reliable')
-
         average = (ead_1 + ead_2)/2
         return average
-
