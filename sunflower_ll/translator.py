@@ -4,6 +4,9 @@ from sunflower_ll.axis_helper import *
 TOPIC = 'topic'
 COMMAND = 'command'
 
+OK = 0
+ERROR = 1
+
 class Translator:
 
     __commands = {
@@ -29,17 +32,20 @@ class Translator:
         'mag_2': 0
     }
 
-    __elevation_angle_data = {
+    __angle_error_offset = {
         'angle_1': 0,
-        'angle_2': 0
+        'angle_2': 0,
+        'angle_3': 0,
     }
 
     __movement_speed = 100
 
+    __operation_mode = 'a'
+
 
 
     ##################################################
-    ################### ACTUATORS ####################
+    ############## STRUCTURE MOVEMENT ################
     ##################################################
 
     # ************** UP AND DOWN **************
@@ -60,43 +66,148 @@ class Translator:
         return self.__commands['stop_expand_retract']
 
 
-    # ************** AXIS MOVEMENTS **************
-    def set_axis_angles(self, new_axis_angles):
-        VALID = 0
-        INVALID = 1
-        try:
-            new_angles = try_update_axis(self.__axis_angles, new_axis_angles)
-        except:
-            print('**** INVALID UPDATE ****')
-            return INVALID
-        self.__axis_angles = new_angles
-        return VALID
+    ##################################################
+    ################# AXIS MOVEMENTS #################
+    ##################################################
 
-    def set_single_axis_angle(self, axis, angle):
-        single_axis = {axis: angle}
-        return self.set_axis_angles(single_axis)
+    def validate_axis(self, axis_angles):
+        # valid_axis_status = OK
+
+        for key in axis_angles:
+            if key == 'angle_1':
+                if (axis_angles[key] < 0) or (axis_angles[key] >= 360):
+                    return ERROR
+
+            if key == 'angle_2':
+                if (axis_angles[key] < 0) or (axis_angles[key] >= 90):
+                    return ERROR
+
+            if key == 'angle_3':
+                if (axis_angles[key] < -360) or (axis_angles[key] >= 360): # NAO DEFINIDO
+                    return ERROR
+
+        return OK
+
+    def max_inverse_axis(self, axis_angles):
+        status = OK
+
+        for key in axis_angles:
+            if key == 'angle_1':
+                angle_1 = (-1)* axis_angles[key]
+
+                if (angle_1 < 0):
+                    angle_1 = max(0, angle_1)
+                    status = ERROR
+                if (angle_1 >= 360):
+                    angle_1 = min(360, angle_1)
+                    status = ERROR
+
+                axis_angles[key] = (-1)* angle_1
+
+            if key == 'angle_2':
+                angle_2 = (-1)* axis_angles[key]
+
+                if (angle_1 < 0):
+                    angle_1 = max(0, angle_2)
+                    status = ERROR
+                if (angle_1 >= 90):
+                    angle_1 = min(90, angle_2)
+                    status = ERROR
+
+                axis_angles[key] = (-1)* angle_2
+
+            if key == 'angle_3':
+                angle_3 = (-1)* axis_angles[key]
+
+                if (angle_3 < -360):
+                    angle_3 = max(-360, angle_3)
+                    status = ERROR
+                if (angle_3 >= 360):
+                    angle_3 = min(360, angle_3)
+                    status = ERROR
+
+                axis_angles[key] = (-1)* angle_3
+                
+
+        return status
+
+
+
+    def generate_movement_string(self, axis_angles, speed):
+        gcode = 'G1 ' + \
+            ' X'+str(axis_angles['angle_1']) + \
+            ' Y'+str(axis_angles['angle_2']) + \
+            ' Z'+str(axis_angles['angle_3']) + \
+            ' F'+str(speed)
+        return gcode
+
+
+
+    def move_axis(self):
+        status = OK
+
+        magnetometer_data  = self.get_magnetometer_data()
+        movement_speed     = self.get_movement_speed()
+
+        print(self.__axis_angles)
+
+        antenna_angles = generate_antenna_angles( \
+                                    self.__axis_angles, 
+                                    self.__angle_error_offset,
+                                    magnetometer_data, 
+                                    self.__operation_mode
+                                    )
+
+        print(antenna_angles)
+
+      
+        if (self.max_inverse_axis(antenna_angles) != OK):
+            print('INVALID')
+            # raise Exception('Invalid axis, FROM MOVE_AXIS')
+            #print('**** INVALID MOVEMENT ****')
+            #return (ERROR, {'topic': 'movement/axis', 'command': 'G1  X0 Y0 Z0 F100'} )
+            status = ERROR
+
+        gcode = self.generate_movement_string(antenna_angles, movement_speed)
+
+
+        move_axis_command = self.__commands['move_axis']
+        move_axis_command[COMMAND] = gcode
+
+        return (status, move_axis_command)
+
+
+
+    def set_axis_angles(self, new_axis_angles):
+
+        if (self.validate_axis(new_axis_angles) != OK):
+            # raise Exception('Invalid axis, FROM UPDATE_AXIS')
+            #print('**** INVALID UPDATE ****')
+            return ERROR
+
+        for key in new_axis_angles:
+            if key == 'angle_1':
+                self.__axis_angles[key] = new_axis_angles[key]
+            if key == 'angle_2':
+                self.__axis_angles[key] = new_axis_angles[key]
+            if key == 'angle_3':
+                self.__axis_angles[key] = new_axis_angles[key]
+
+        return OK
+
+
 
     def get_axis_angles(self):
         return self.__axis_angles
 
-    def move_axis(self):
-        try:
-            magnetometer_data = self.get_magnetometer_data()
-            elevation_angle_data = self.get_elevation_angle_data()
-            antenna_angles = update_angles_from_reference( \
-                                        self.__axis_angles, 
-                                        magnetometer_data,
-                                        elevation_angle_data)
-            gcode = try_move_axis(antenna_angles, self.__movement_speed)
-        except:
-            print('**** INVALID MOVEMENT ****')
-            gcode = ''
-        move_axis_command = self.__commands['move_axis']
-        move_axis_command[COMMAND] = gcode
-        return move_axis_command
+
+    ##################################################
+    #################### SETTINGS ####################
+    ##################################################
+
 
     def set_movement_speed(self, movement_speed):
-        if (movement_speed > 0) and (movement_speed < 1000): 
+        if (movement_speed > 0) and (movement_speed <= 1000): 
             self.__movement_speed = movement_speed
             return 0
         return 1
@@ -107,43 +218,51 @@ class Translator:
 
 
 
+    def set_operation_mode(self, operation_mode):
+        if (operation_mode == "a") or (operation_mode == "b"): 
+            self.__operation_mode = operation_mode
+            return 0
+        return 1
+
+    def get_operation_mode(self):
+        return self.__operation_mode
+
+
+
+
     ##################################################
     #################### SENSORS ####################
     #################################################
 
     # Magnetometer Data
-    def set_magnetometer_data(self, value1, value2):
-        TOL = 1
-        if abs(value1 - value2) > TOL:
-            print('******** Magnetometer data is not reliable ********')
-            return 1
-        else:
-            self.__magnetometer_data['mag_1'] = value1
-            self.__magnetometer_data['mag_2'] = value2
-            return 0
+    def set_magnetometer_data(self, value):
+        self.__magnetometer_data['mag_1'] = value
+        return 0
 
     def get_magnetometer_data(self):
         mag_1 = self.__magnetometer_data['mag_1']
-        mag_2 = self.__magnetometer_data['mag_2']
-
-        average = (mag_1 + mag_2)/2
-        return average
+        return mag_1
 
 
-    # Elevation Angle data
-    def set_elevation_angle_data(self, value1, value2):
-        TOL = 1
-        if abs(value1 - value2) > TOL:
-            print('******** Elevation data is not reliable ********')
-            return 1
-        else:
-            self.__elevation_angle_data['angle_1'] = value1
-            self.__elevation_angle_data['angle_2'] = value2
-            return 0
+    # Elevation Angle data     ----- NAO SERA UTILIZADO.
+    def set_angle_error_offset(self, angles):
 
-    def get_elevation_angle_data(self):
-        ead_1 = self.__elevation_angle_data['angle_1']
-        ead_2 = self.__elevation_angle_data['angle_2']
+        for key in axis_angles:
+            if key == 'angle_1':
+                self.__angle_error_offset[key] = angles[key]
+            if key == 'angle_2':
+                self.__angle_error_offset[key] = angles[key]
+            if key == 'angle_3':
+                self.__angle_error_offset[key] = angles[key]
 
-        average = (ead_1 + ead_2)/2
-        return average
+        return 0
+
+    def get_angle_error_offset(self):
+
+        return self.__angle_error_offset
+
+
+
+
+
+
