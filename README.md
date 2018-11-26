@@ -36,10 +36,7 @@ Function call's are converted into G-Code strings.
         'angle_3': 99
     }
     -> tr.set_axis_angles(angles) : "0=sucess, 1=fail"
-        - angles is a dictionary like the one above. It has the identifiers 'angle_1', 'angle_2', 'angle_3'
-        - output: 0="valid angle", 1="invalid angle"
-    -> tr.set_single_axis_angle(identifier, angle) : "0=sucess, 1=fail"
-        - identifier options: 'angle_1', 'angle_2', 'angle_3'
+        - angles is a dictionary like the one above. It uses the identifiers 'angle_1' and/or 'angle_2' and/or 'angle_3'
         - output: 0="valid angle", 1="invalid angle"
     -> tr.get_axis_angles()
 
@@ -48,16 +45,14 @@ Function call's are converted into G-Code strings.
         - output: 0="valid speed", 1="invalid speed"
     -> tr.get_movement_speed()
 
+    -> tr.go_home() : "Returns go_home string command to send to broker"
+    -> tr.unlock() : "Returns unlock string command to send to broker"
 
     -> tr.move_axis() : "returns output to send to broker"
 
 ### Sensors
 
-    -> tr.set_magnetometer_data(value_magnetometer_1, value_magnetometer_2)
+    -> tr.set_magnetometer_data(magnetometer_value)
         - output: 0="ok", 1="bad magnetometers"
-    -> tr.get_magnetometer_data() : "returns magnetometer average"
+    -> tr.get_magnetometer_data() : "returns magnetometer value"
 
-
-    -> tr.set_elevation_angle_data(value_sensor_1, value_sensor_2)
-        - output: 0="ok", 1="bad sensor"
-    -> tr.get_elevation_angle_data() : "returns sensors average"
