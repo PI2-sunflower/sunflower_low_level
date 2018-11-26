@@ -9,39 +9,41 @@ ERROR = 1
 
 class Translator:
 
-    __commands = {
-        'go_up': {TOPIC: 'movement/up_down', COMMAND: 'up'},
-        'go_down': {TOPIC: 'movement/up_down', COMMAND: 'down'},
-        'stop_up_down': {TOPIC: 'movement/up_down', COMMAND: 'stop'},
-    
-        'expand': {TOPIC: 'movement/expand_retract', COMMAND: 'expand'},
-        'retract': {TOPIC: 'movement/expand_retract', COMMAND: 'retract'},
-        'stop_expand_retract': {TOPIC: 'movement/expand_retract', COMMAND: 'stop'},
+    def __init__(self):
+        self.__commands = {
+            'go_up': {TOPIC: 'movement/up_down', COMMAND: 'up'},
+            'go_down': {TOPIC: 'movement/up_down', COMMAND: 'down'},
+            'stop_up_down': {TOPIC: 'movement/up_down', COMMAND: 'stop'},
+        
+            'expand': {TOPIC: 'movement/expand_retract', COMMAND: 'expand'},
+            'retract': {TOPIC: 'movement/expand_retract', COMMAND: 'retract'},
+            'stop_expand_retract': {TOPIC: 'movement/expand_retract', COMMAND: 'stop'},
 
-        'move_axis': {TOPIC: 'movement/axis'} # axis feedback -> movement/axis_feedback 
-    }
+            'unlock': {TOPIC: 'movement/axis', COMMAND: 'unlock'},
+            'go_home': {TOPIC: 'movement/axis', COMMAND: 'go_home'},
+            'move_axis': {TOPIC: 'movement/axis'} # axis feedback -> movement/axis_feedback 
+        }
 
-    __axis_angles = {
-        'angle_1': 0,
-        'angle_2': 0,
-        'angle_3': 0
-    }
+        self.__axis_angles = {
+            'angle_1': 0,
+            'angle_2': 0,
+            'angle_3': 0
+        }
 
-    __magnetometer_data = {
-        'mag_1': 0,
-        'mag_2': 0
-    }
+        self.__magnetometer_data = {
+            'mag_1': 0,
+            'mag_2': 0
+        }
 
-    __angle_error_offset = {
-        'angle_1': 0,
-        'angle_2': 0,
-        'angle_3': 0,
-    }
+        self.__angle_error_offset = {
+            'angle_1': 0,
+            'angle_2': 0,
+            'angle_3': 0,
+        }
 
-    __movement_speed = 100
+        self.__movement_speed = 500
 
-    __operation_mode = 'a'
-
+        self.__operation_mode = 'a'
 
 
     ##################################################
@@ -69,6 +71,12 @@ class Translator:
     ##################################################
     ################# AXIS MOVEMENTS #################
     ##################################################
+    
+    def unlock(self):
+        return self.__commands['unlock']
+    def go_home(self):
+        return self.__commands['go_home']
+
 
     def validate_axis(self, axis_angles):
         # valid_axis_status = OK
@@ -107,11 +115,11 @@ class Translator:
             if key == 'angle_2':
                 angle_2 = (-1)* axis_angles[key]
 
-                if (angle_1 < 0):
-                    angle_1 = max(0, angle_2)
+                if (angle_2 < 0):
+                    angle_2 = max(0, angle_2)
                     status = ERROR
-                if (angle_1 >= 90):
-                    angle_1 = min(90, angle_2)
+                if (angle_2 >= 180):
+                    angle_2 = min(180, angle_2)
                     status = ERROR
 
                 axis_angles[key] = (-1)* angle_2
@@ -244,10 +252,9 @@ class Translator:
         return mag_1
 
 
-    # Elevation Angle data     ----- NAO SERA UTILIZADO.
     def set_angle_error_offset(self, angles):
 
-        for key in axis_angles:
+        for key in angles:
             if key == 'angle_1':
                 self.__angle_error_offset[key] = angles[key]
             if key == 'angle_2':
