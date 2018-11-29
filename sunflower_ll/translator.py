@@ -87,15 +87,15 @@ class Translator:
 
         for key in axis_angles:
             if key == 'angle_1':
-                if (axis_angles[key] < 5) or (axis_angles[key] >= 355):
+                if (axis_angles[key] < 5) or (axis_angles[key] > 335):
                     return ERROR
 
             if key == 'angle_2':
-                if (axis_angles[key] < 5) or (axis_angles[key] >= 90):
+                if (axis_angles[key] < 5) or (axis_angles[key] > 90):
                     return ERROR
 
             if key == 'angle_3':
-                if (axis_angles[key] < -360) or (axis_angles[key] >= 360): # NAO DEFINIDO
+                if (axis_angles[key] < 5) or (axis_angles[key] > 105): # NAO DEFINIDO
                     return ERROR
 
         return OK
@@ -108,10 +108,10 @@ class Translator:
                 angle_1 = (-1)* axis_angles[key]
 
                 if (angle_1 < 5):
-                    angle_1 = max(5, angle_1)
+                    angle_1 = 5
                     status = ERROR
-                if (angle_1 >= 355):
-                    angle_1 = min(355, angle_1)
+                if (angle_1 >= 335):
+                    angle_1 = 335
                     status = ERROR
 
                 axis_angles[key] = (-1)* angle_1
@@ -120,10 +120,10 @@ class Translator:
                 angle_2 = (-1)* axis_angles[key]
 
                 if (angle_2 < 5):
-                    angle_2 = max(5, angle_2)
+                    angle_2 = 5
                     status = ERROR
                 if (angle_2 >= 180):
-                    angle_2 = min(180, angle_2)
+                    angle_2 = 180
                     status = ERROR
 
                 axis_angles[key] = (-1)* angle_2
@@ -131,11 +131,11 @@ class Translator:
             if key == 'angle_3':
                 angle_3 = (-1)* axis_angles[key]
 
-                if (angle_3 < -360):
-                    angle_3 = max(-360, angle_3)
+                if (angle_3 < 5):
+                    angle_3 = 5
                     status = ERROR
-                if (angle_3 >= 360):
-                    angle_3 = min(360, angle_3)
+                if (angle_3 >= 105):
+                    angle_3 = 105
                     status = ERROR
 
                 axis_angles[key] = (-1)* angle_3
