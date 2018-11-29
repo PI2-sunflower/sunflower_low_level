@@ -12,7 +12,6 @@ def generate_antenna_angles(axis_angles, angle_error_offset, magnetometer_angle,
             elif (operation_mode == 'b'):
                 antenna_angle_1 = (axis_angles[key] + magnetometer_angle + angle_error_offset[key]) + 180
 
-
             if antenna_angle_1 > 360:
                 antenna_angle_1 -= 360
             if antenna_angle_1 < 0:
@@ -31,12 +30,6 @@ def generate_antenna_angles(axis_angles, angle_error_offset, magnetometer_angle,
             elif (operation_mode == 'b'):
                 antenna_angle_2 = 180 - (axis_angles[key] + angle_error_offset[key])
 
-            # NOT VALID FOR ANGLE 2
-            # if antenna_angle_2 > 360:
-            #     antenna_angle_2 -= 360
-            # if antenna_angle_2 < 0:
-            #     antenna_angle_2 += 360
-            
             antenna_angle_2 = round(antenna_angle_2, 4) 
             antenna_angles[key] = (-1) * antenna_angle_2
 

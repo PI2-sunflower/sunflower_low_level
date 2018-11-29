@@ -83,7 +83,7 @@ class Translator:
 
         for key in axis_angles:
             if key == 'angle_1':
-                if (axis_angles[key] < 0) or (axis_angles[key] >= 360):
+                if (axis_angles[key] < 5) or (axis_angles[key] >= 355):
                     return ERROR
 
             if key == 'angle_2':
@@ -103,11 +103,11 @@ class Translator:
             if key == 'angle_1':
                 angle_1 = (-1)* axis_angles[key]
 
-                if (angle_1 < 0):
-                    angle_1 = max(0, angle_1)
+                if (angle_1 < 5):
+                    angle_1 = max(5, angle_1)
                     status = ERROR
-                if (angle_1 >= 360):
-                    angle_1 = min(360, angle_1)
+                if (angle_1 >= 355):
+                    angle_1 = min(355, angle_1)
                     status = ERROR
 
                 axis_angles[key] = (-1)* angle_1
