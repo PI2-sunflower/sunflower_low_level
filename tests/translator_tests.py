@@ -27,6 +27,8 @@ class TranslatorTests(unittest.TestCase):
         self.assertEqual(self.tr.unlock(), {'topic': 'movement/axis', 'command': 'unlock'})
     def test_go_home(self):
         self.assertEqual(self.tr.go_home(), {'topic': 'movement/axis', 'command': 'go_home'})
+    def test_restart(self):
+        self.assertEqual(self.tr.restart(), {'topic': 'movement/axis', 'command': 'restart'})
 
 
     def test_get_set_speed(self):
@@ -105,7 +107,7 @@ class TranslatorTests(unittest.TestCase):
 
 
     def test_axis_movement(self):
-        self.assertEqual(self.tr.move_axis(), (0, {'topic': 'movement/axis', 'command': 'G1  X0 Y0 Z0 F500'}))
+        self.assertEqual(self.tr.move_axis(), (0, {'topic': 'movement/axis', 'command': 'G1  X-5 Y-5 Z-5 F500'}))
 
         good_angles = {
             'angle_1': 11,
@@ -119,7 +121,7 @@ class TranslatorTests(unittest.TestCase):
 
 
     def test_angle_error_offset(self):
-        self.assertEqual(self.tr.move_axis(), (0, {'topic': 'movement/axis', 'command': 'G1  X0 Y0 Z0 F500'}))
+        self.assertEqual(self.tr.move_axis(), (0, {'topic': 'movement/axis', 'command': 'G1  X-5 Y-5 Z-5 F500'}))
 
         angle_error_offset = {
             'angle_1': 4.5,
@@ -128,11 +130,11 @@ class TranslatorTests(unittest.TestCase):
         }
         self.assertEqual(self.tr.set_angle_error_offset(angle_error_offset), 0);
         self.assertEqual(self.tr.get_angle_error_offset(), angle_error_offset);
-        self.assertEqual(self.tr.move_axis(), (0, {'topic': 'movement/axis', 'command': 'G1  X-4.5 Y-9.3 Z-3.3 F500'}))
+        self.assertEqual(self.tr.move_axis(), (0, {'topic': 'movement/axis', 'command': 'G1  X-9.5 Y-14.3 Z-8.3 F500'}))
 
 
     def test_axis_movement_with_mag_and_error(self):
-        self.assertEqual(self.tr.move_axis(), (0, {'topic': 'movement/axis', 'command': 'G1  X0 Y0 Z0 F500'}))
+        self.assertEqual(self.tr.move_axis(), (0, {'topic': 'movement/axis', 'command': 'G1  X-5 Y-5 Z-5 F500'}))
 
         good_angles = {
             'angle_1': 11,
@@ -171,7 +173,7 @@ class TranslatorTests(unittest.TestCase):
             'angle_3': 0,
         }
         self.assertEqual(self.tr.set_angle_error_offset(limit_angle_error_offset), 0);
-        self.assertEqual(self.tr.move_axis(), (1, {'topic': 'movement/axis', 'command': 'G1  X-9.5 Y0 Z-99 F715'}))
+        self.assertEqual(self.tr.move_axis(), (1, {'topic': 'movement/axis', 'command': 'G1  X-9.5 Y-5 Z-99 F715'}))
 
 
 

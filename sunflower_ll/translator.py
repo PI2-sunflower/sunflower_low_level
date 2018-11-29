@@ -21,13 +21,14 @@ class Translator:
 
             'unlock': {TOPIC: 'movement/axis', COMMAND: 'unlock'},
             'go_home': {TOPIC: 'movement/axis', COMMAND: 'go_home'},
+            'restart': {TOPIC: 'movement/axis', COMMAND: 'restart'},
             'move_axis': {TOPIC: 'movement/axis'} # axis feedback -> movement/axis_feedback 
         }
 
         self.__axis_angles = {
-            'angle_1': 0,
-            'angle_2': 0,
-            'angle_3': 0
+            'angle_1': 5,
+            'angle_2': 5,
+            'angle_3': 5
         }
 
         self.__magnetometer_data = {
@@ -76,6 +77,9 @@ class Translator:
         return self.__commands['unlock']
     def go_home(self):
         return self.__commands['go_home']
+    def restart(self):
+        return self.__commands['restart']
+
 
 
     def validate_axis(self, axis_angles):
@@ -87,7 +91,7 @@ class Translator:
                     return ERROR
 
             if key == 'angle_2':
-                if (axis_angles[key] < 0) or (axis_angles[key] >= 90):
+                if (axis_angles[key] < 5) or (axis_angles[key] >= 90):
                     return ERROR
 
             if key == 'angle_3':
@@ -115,8 +119,8 @@ class Translator:
             if key == 'angle_2':
                 angle_2 = (-1)* axis_angles[key]
 
-                if (angle_2 < 0):
-                    angle_2 = max(0, angle_2)
+                if (angle_2 < 5):
+                    angle_2 = max(5, angle_2)
                     status = ERROR
                 if (angle_2 >= 180):
                     angle_2 = min(180, angle_2)
