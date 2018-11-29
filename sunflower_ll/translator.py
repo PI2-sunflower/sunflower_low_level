@@ -21,7 +21,7 @@ class Translator:
 
             'unlock': {TOPIC: 'movement/axis', COMMAND: 'unlock'},
             'go_home': {TOPIC: 'movement/axis', COMMAND: 'go_home'},
-            'restart': {TOPIC: 'movement/axis', COMMAND: 'restart'},
+            'reset_axis': {TOPIC: 'movement/axis', COMMAND: 'reset_axis'},
             'move_axis': {TOPIC: 'movement/axis'} # axis feedback -> movement/axis_feedback 
         }
 
@@ -77,8 +77,8 @@ class Translator:
         return self.__commands['unlock']
     def go_home(self):
         return self.__commands['go_home']
-    def restart(self):
-        return self.__commands['restart']
+    def reset_axis(self):
+        return self.__commands['reset_axis']
 
 
 

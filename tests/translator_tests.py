@@ -27,8 +27,8 @@ class TranslatorTests(unittest.TestCase):
         self.assertEqual(self.tr.unlock(), {'topic': 'movement/axis', 'command': 'unlock'})
     def test_go_home(self):
         self.assertEqual(self.tr.go_home(), {'topic': 'movement/axis', 'command': 'go_home'})
-    def test_restart(self):
-        self.assertEqual(self.tr.restart(), {'topic': 'movement/axis', 'command': 'restart'})
+    def test_reset_axis(self):
+        self.assertEqual(self.tr.reset_axis(), {'topic': 'movement/axis', 'command': 'reset_axis'})
 
 
     def test_get_set_speed(self):
